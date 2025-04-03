@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -25,7 +24,7 @@ prefs = {
 options.add_experimental_option("prefs", prefs)
 
 driver = webdriver.Chrome(options=options)
-wait = WebDriverWait(driver, 10)
+wait = WebDriverWait(driver, 15)
 
 # link for curated projects (168) - 81 phenotypes
 # driver.set_page_load_timeout(240)
@@ -55,6 +54,8 @@ try:
 except NoSuchElementException:
     print("Searchbox is not found.")
 
+# TODO: need to add code block to click search button to exclude "Health" results
+
 # expand to show 100 results
 try:
     expand_100 = WebDriverWait(driver, 10).until(
@@ -82,7 +83,7 @@ for i, group in enumerate(group_rows):
 
 for idx, proj_id in groups_data:
     try:
-        group = driver.find_elements(By.XPATH, "//tr[contains(@class, 'ng-table-group')]")[index]
+        group = driver.find_elements(By.XPATH, "//tr[contains(@class, 'ng-table-group')]")[idx]
         time.sleep(1)
 
         script = """
