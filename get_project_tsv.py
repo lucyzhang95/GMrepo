@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -28,11 +29,23 @@ wait = WebDriverWait(driver, 10)
 # link for curated projects (168) - 81 phenotypes
 driver.get("https://gmrepo.humangut.info/data/curatedprojects")
 
-# click the checkbox for "Except for..." selection
+# click the checkbox for "Except for..."
 try:
-    checkbox = driver.find_element(By.ID, "isInvertedSearch")
-    checkbox.click()
+    checkbox = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.ID, "isInvertedSearch"))
+    )
+    driver.execute_script("arguments[0].click();", checkbox)
 except NoSuchElementException:
-    print("Checkbox is not found.")
+    print("Checkbox is not clicked.")
 
-#
+# enter "Health" as key to filter out Health control results
+try:
+    key = "Health"
+    searchbox = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "mySearchTerm"))
+    )
+    searchbox.clear()
+    searchbox.send_keys(key)
+    print(f"Search term `{key}` entered")
+except NoSuchElementException:
+    print("Searchbox is not found.")
