@@ -8,7 +8,8 @@ import os
 import glob
 
 t_start = time.time()
-download_dir = os.path.abspath("downloads")
+base_download_dir = os.path.abspath("downloads")
+download_dir = os.path.join(base_download_dir, "phenotype_comparisons")
 os.makedirs(download_dir, exist_ok=True)
 
 # headless auto-download setup
