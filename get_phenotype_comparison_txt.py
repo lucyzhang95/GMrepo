@@ -17,7 +17,6 @@ options = Options()
 options.add_argument("--headless")
 options.add_argument("--disable-gpu")
 options.add_argument("--window-size=1920,1080")
-
 prefs = {
     "download.default_directory": download_dir,
     "download.prompt_for_download": False,
@@ -25,6 +24,7 @@ prefs = {
     "safebrowsing.enabled": True
 }
 options.add_experimental_option("prefs", prefs)
+
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 10)
 
