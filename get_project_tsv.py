@@ -49,3 +49,14 @@ try:
     print(f"Search term `{key}` entered")
 except NoSuchElementException:
     print("Searchbox is not found.")
+
+# expand to show 100 results
+try:
+    expand_100 = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[.//span[text()='100']]"))
+    )
+    expand_100.click()
+    print("Clicked '100' to show all disease projects.")
+except NoSuchElementException:
+    print("Could not find '100' button.")
+
