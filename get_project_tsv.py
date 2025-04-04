@@ -13,6 +13,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from dump_utils import get_project_links
 
+# TODO: code can be further optimized to run faster (current runtime is ~14 min)
+
 t_start = time.time()
 base_download_dir = os.path.abspath("downloads")
 download_dir = os.path.join(base_download_dir, "projects")
