@@ -55,6 +55,14 @@ except NoSuchElementException:
     print("Searchbox is not found.")
 
 # TODO: need to add code block to click search button to exclude "Health" results
+try:
+    search_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "span.input-group-btn button.btn.btn-default[type='submit']"))
+    )
+    search_button.click()
+    print(f"Search button clicked!")
+except NoSuchElementException:
+    raise Exception("Search button is not found/clickable.")
 
 # expand to show 100 results
 try:
@@ -67,7 +75,6 @@ try:
 except NoSuchElementException:
     print("Could not find '100' button.")
 
-# TODO: haven't tested yet, get stuck after opening chrome browser
 # get project ids and hrefs per phenotype/disease under that project
 project_links = {}
 
@@ -115,6 +122,6 @@ for idx, proj_id in groups_data:
     except Exception as e:
         print(f"Error processing project {proj_id} at index {idx}: {e}")
 
-link_ct = sum([len(link) for link in project_links.values()])
+link_ct = sum([len(link) for link in project_links.values()]) # 04042025: 100 projects with 127 links on page 1
 print(f"Found {len(project_links)} projects.")
 print(f"Found {link_ct} links.")
