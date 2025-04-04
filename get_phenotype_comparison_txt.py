@@ -1,11 +1,12 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
-import os
 import glob
+import os
+import time
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 t_start = time.time()
 base_download_dir = os.path.abspath("downloads")
@@ -21,7 +22,7 @@ prefs = {
     "download.default_directory": download_dir,
     "download.prompt_for_download": False,
     "download.directory_upgrade": True,
-    "safebrowsing.enabled": True
+    "safebrowsing.enabled": True,
 }
 options.add_experimental_option("prefs", prefs)
 
@@ -44,9 +45,23 @@ except Exception as e:
     exit()
 
 # get all phenotype comparison links
-wait.until(EC.presence_of_all_elements_located((By.XPATH, "//a[contains(@href, '/phenotypes/comparisons/')]")))
-comparison_links = driver.find_elements(By.XPATH, "//a[contains(@href, '/phenotypes/comparisons/')]")
-total_links = list(set([link.get_attribute("href") for link in comparison_links if "view details" in link.text.lower()]))
+wait.until(
+    EC.presence_of_all_elements_located(
+        (By.XPATH, "//a[contains(@href, '/phenotypes/comparisons/')]")
+    )
+)
+comparison_links = driver.find_elements(
+    By.XPATH, "//a[contains(@href, '/phenotypes/comparisons/')]"
+)
+total_links = list(
+    set(
+        [
+            link.get_attribute("href")
+            for link in comparison_links
+            if "view details" in link.text.lower()
+        ]
+    )
+)
 print(f"Found {len(total_links)} comparison links.")
 
 # download txt files
@@ -57,22 +72,26 @@ for url in total_links:
 
     # "All" button contains both species and genus related to the phenotype/disease
     try:
-        all_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//label[contains(., 'All')]/input")))
+        all_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//label[contains(., 'All')]/input"))
+        )
         driver.execute_script("arguments[0].click();", all_button)
-    except:
-        print("'All' button not found or not clickable.")
+    except Exception as e:
+        print("'All' button not found or not clickable.", e)
         continue
     time.sleep(2)
 
     # download txt files (txt instead of tsv showed on website)
     try:
-        download_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@ng-click, 'downloadNgTable')]")))
+        download_button = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//a[contains(@ng-click, 'downloadNgTable')]"))
+        )
         download_button.click()
         print("Downloading...")
 
         time.sleep(5)
-    except:
-        print("Download button not found.")
+    except Exception as e:
+        print("Download button not found.", e)
 
 driver.quit()
 
