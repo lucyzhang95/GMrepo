@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from utils import get_project_links
 import time
 import os
 import glob
@@ -22,9 +23,8 @@ prefs = {
     "safebrowsing.enabled": True
 }
 options.add_experimental_option("prefs", prefs)
-
 driver = webdriver.Chrome(options=options)
-wait = WebDriverWait(driver, 15)
+wait = WebDriverWait(driver, 10)
 
 # link for curated projects (168) - 81 phenotypes
 # driver.set_page_load_timeout(240)
@@ -76,52 +76,30 @@ except NoSuchElementException:
     print("Could not find '100' button.")
 
 # get project ids and hrefs per phenotype/disease under that project
-project_links = {}
+all_project_links = {}
+p_num = 1
 
-groups_data = []
-group_rows = driver.find_elements(By.XPATH, "//tr[contains(@class, 'ng-table-group')]")
-for i, group in enumerate(group_rows):
+while True:
+    print(f"Scraping page {p_num}...")
+    p_proj_links = get_project_links(driver, wait)
+    all_project_links.update(p_proj_links)
+
     try:
-        proj_text = group.find_element(By.CSS_SELECTOR, "strong.ng-binding").text
-        proj_id = proj_text.split()[0].strip()
-        groups_data.append((i, proj_id))
+        nxt = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//li[contains(@class, 'page-item')]/a[normalize-space(text())='»']"))
+        )
+        parent_li = nxt.find_element(By.XPATH, "./ancestor::li")
+        if "disabled" in parent_li.get_attribute("class"):
+            print("Last page reached.")
+            break
+        print("Going to next page...")
+        nxt.click()
+        time.sleep(3)
+        p_num += 1
     except Exception as e:
-        print(f"Could not find {proj_text} at index {i}: {e}")
+        print(f"No next button found or an error occurred: {e}")
+        break
 
-for idx, proj_id in groups_data:
-    try:
-        group = driver.find_elements(By.XPATH, "//tr[contains(@class, 'ng-table-group')]")[idx]
-        time.sleep(1)
-
-        script = """
-        var groupRow = arguments[0];
-        var siblings = [];
-        var next = groupRow.nextElementSibling;
-        while(next && !next.classList.contains('ng-table-group')){
-            siblings.push(next);
-            next = next.nextElementSibling;
-        }
-        return siblings;
-        """
-        sibling_rows = driver.execute_script(script, group)
-
-        # get href links per each phenotype
-        links = []
-        for row in sibling_rows:
-            try:
-                link = row.find_element(By.XPATH, ".//a[starts-with(@href, '/phenotypes/')]")
-                href = link.get_attribute("href")
-                if href:
-                    print(f"Found link: {href}")
-                    links.append(href)
-            except Exception as e:
-                continue
-
-        if links:
-            project_links[proj_id] = links
-    except Exception as e:
-        print(f"Error processing project {proj_id} at index {idx}: {e}")
-
-link_ct = sum([len(link) for link in project_links.values()]) # 04042025: 100 projects with 127 links on page 1
-print(f"Found {len(project_links)} projects.")
-print(f"Found {link_ct} links.")
+link_ct = sum([len(link) for link in all_project_links.values()]) # 04042025: 100 projects with 127 links on page 1 and 56 links on page 2
+print(f"Found {len(all_project_links)} projects with a total of {link_ct} links.")
+print(f"First project link: {all_project_links[0]}")
