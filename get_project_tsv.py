@@ -1,15 +1,17 @@
-from selenium import webdriver
-from selenium.common import NoSuchElementException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from utils import get_project_links
-import time
-import os
-import requests
 import csv
 import glob
+import os
+import time
+
+import requests
+from selenium import webdriver
+from selenium.common import NoSuchElementException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
+from utils import get_project_links
 
 t_start = time.time()
 base_download_dir = os.path.abspath("downloads")
@@ -17,12 +19,14 @@ download_dir = os.path.join(base_download_dir, "projects")
 os.makedirs(download_dir, exist_ok=True)
 
 options = Options()
-options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36")
+options.add_argument(
+    "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+)
 prefs = {
     "download.default_directory": download_dir,
     "download.prompt_for_download": False,
-    "download.directory_upgrade":True,
-    "safebrowsing.enabled": True
+    "download.directory_upgrade": True,
+    "safebrowsing.enabled": True,
 }
 options.add_experimental_option("prefs", prefs)
 driver = webdriver.Chrome(options=options)
@@ -58,10 +62,15 @@ except NoSuchElementException:
 
 try:
     search_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "span.input-group-btn button.btn.btn-default[type='submit']"))
+        EC.element_to_be_clickable(
+            (
+                By.CSS_SELECTOR,
+                "span.input-group-btn button.btn.btn-default[type='submit']",
+            )
+        )
     )
     search_button.click()
-    print(f"Search button clicked!")
+    print("Search button clicked!")
 except NoSuchElementException:
     raise Exception("Search button is not found/clickable.")
 
@@ -87,7 +96,12 @@ while True:
 
     try:
         nxt = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//li[contains(@class, 'page-item')]/a[normalize-space(text())='»']"))
+            EC.element_to_be_clickable(
+                (
+                    By.XPATH,
+                    "//li[contains(@class, 'page-item')]/a[normalize-space(text())='»']",
+                )
+            )
         )
         parent_li = nxt.find_element(By.XPATH, "./ancestor::li")
         if "disabled" in parent_li.get_attribute("class"):
@@ -124,8 +138,12 @@ for _id, p_urls in all_project_links.items():
 
         try:
             dump_elem = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,
-                    "//a[contains(text(), 'Download stats') and contains(@href, '.tsv.gz')]"))
+                EC.presence_of_element_located(
+                    (
+                        By.XPATH,
+                        "//a[contains(text(), 'Download stats') and contains(@href, '.tsv.gz')]",
+                    )
+                )
             )
             dump_url = dump_elem.get_attribute("href")
 
