@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from utils import get_project_links
+from dump_utils import get_project_links
 
 t_start = time.time()
 base_download_dir = os.path.abspath("downloads")
