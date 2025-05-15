@@ -8,3 +8,5 @@ License: Non-Commercial 3.0 Unported License (CC BY-NC 3.0)
 ## GMrepo curation process:
 1. [Processing and quality control](https://evolgeniusteam.github.io/gmrepodocumentation/materialsandmethods/dataprocessingandqc/)
 2. [Disease marker identifier](https://evolgeniusteam.github.io/gmrepodocumentation/materialsandmethods/indepthanalyses/)
+
+## Notes regarding source database API usage:
